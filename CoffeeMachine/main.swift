@@ -48,6 +48,7 @@ struct CustomDrink: CoffeeDrink {
     var milk: Int
 }
 
+
 func getInput() -> String {
     let keyboard = FileHandle.standardInput
     let inputData = keyboard.availableData
@@ -64,6 +65,7 @@ enum Command: String {
     case clean
     case recipe
     case help
+    case quit
 }
 
 enum Argument: String {
@@ -81,14 +83,14 @@ class CoffeeMachine {
     
     private var isOn: Bool = false
     
-    private let cupsBeforeClean: Int = 5
+    private let cupsBeforeClean: Int = 7
     private var cupsMade: Int = 0
     
     private let waterCapacity: Int = 2000
     private let coffeeCapacity: Int = 500
     private let milkCapacity: Int = 1000
     
-    private var ingredients: Ingredients = Ingredients(water: 1000, coffee: 300, milk: 1000)
+    private var ingredients: Ingredients = Ingredients(water: 1000, coffee: 300, milk: 800)
     
     
     // MARK: - Computed properties
@@ -100,7 +102,7 @@ class CoffeeMachine {
     private var milkStatus: String { "Milk: \(ingredients.milk)/\(milkCapacity) ml"}
     private var cleaningStatus: String { cupsMade < cupsBeforeClean ? "Needs cleaning after \(cupsBeforeClean - cupsMade) cups" : "Needs cleaning" }
     
-    private var ingredientsStatus: String { [waterStatus, coffeeStatus, milkStatus].joined(separator: ".") }
+    private var ingredientsStatus: String { [waterStatus, coffeeStatus, milkStatus].joined(separator: ". ") }
     
     // MARK: - Methods
     
@@ -141,7 +143,7 @@ class CoffeeMachine {
             return
         }
         guard quantity <= cupsBeforeClean - cupsMade else {
-            print("--Only \(cupsBeforeClean - cupsMade) cups can be made.--")
+            print("--Only \(cupsBeforeClean - cupsMade) cups can be made.")
             if cupsMade != 0 {
                 print("--Please clean the coffemachine first to make up to \(cupsBeforeClean) cups.")
             }
@@ -180,7 +182,8 @@ class CoffeeMachine {
         let makeCustom = "make 'coffee amount' 'water amount' 'milk amount' - To make custom coffee drink. Example: make 15 60 100"
         let printRecipe = "recipe 'coffee drink' - To print a recipe of a drink. Example: print ca"
         let help = "help - To view manual"
-        let all = [title, args, on, off, add, check, clean, make, makeCustom, printRecipe, help].joined(separator: "\n")
+        let quit = "quit - To quit the program"
+        let all = [title, args, on, off, add, check, clean, make, makeCustom, printRecipe, help, quit].joined(separator: "\n")
         print(all)
     }
     
@@ -307,8 +310,9 @@ class CoffeeMachine {
                     continue input
                 }
             case .help:
-                guard isOn else { print("--Coffeemechine is off. Run 'on' to turn on"); continue input }
                 printUsage()
+            case .quit:
+                shouldQuit = true
             }
         }
     }
